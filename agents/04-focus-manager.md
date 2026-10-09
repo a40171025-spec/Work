@@ -17,7 +17,7 @@
 - Paradise Watch: חנות שעונים ב-Wix (טיוטה)
 - Quickbuy: חנות ב-Wix (באוויר)
 - Luxe Time Portal: חנות שעונים ב-Lovable
-- Smokehouse / Smoke Meat Ashkelon: אתר הזמנות למסעדה (כמה גרסאות ב-Lovable)
 - מעקב חובות ומשמרות: הרבה גרסאות ב-Lovable + אפליקציה בגיטהאב
 - אפליקציות כושר, פיננסים ווידאו (Cal AI, Viral Edit וכו'): רעיונות/טיוטות
-- פרויקט בפוקוס: [לבחור אחד]
+- **העסק העיקרי: חנות השעונים.** יש כרגע 3 חנויות (Paradise Watch, Quickbuy, Luxe Time Portal) וצריך לבחור אחת ולאחד אליה הכול.
+- פרויקט בפוקוס: [החנות שנבחרה]
