@@ -47,7 +47,11 @@ with open(args.video, 'rb') as fh:
 OUT = os.path.join(HERO, VERSION)
 if os.path.isdir(HERO):
     for old in os.listdir(HERO):
-        shutil.rmtree(os.path.join(HERO, old), ignore_errors=True)
+        target = os.path.join(HERO, old)
+        if os.path.isdir(target):
+            shutil.rmtree(target, ignore_errors=True)
+        else:
+            os.remove(target)
 os.makedirs(OUT, exist_ok=True)
 URL = f'/assets/hero/{VERSION}/'
 

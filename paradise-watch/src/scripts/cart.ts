@@ -95,7 +95,8 @@ function render() {
   document.querySelectorAll<HTMLElement>('[data-cart-open]').forEach((el) => el.setAttribute('aria-label', `פתיחת הסל, ${t.qty} פריטים`));
   if (!body || !foot || !sum) return;
   if (!lines.length) {
-    body.innerHTML = `<div class="drawer__empty"><p>הסל ריק. בחרו שעון מהקולקציה ✨</p><a class="btn btn--dark btn--sm" href="/#collection" data-cart-close>לקולקציה</a></div>`;
+    const href = drawer?.dataset.collectionHref ?? '/#collection';
+    body.innerHTML = `<div class="drawer__empty"><p>הסל ריק. בחרו שעון מהקולקציה ✨</p><a class="btn btn--dark btn--sm" href="${href}" data-cart-close>לקולקציה</a></div>`;
     foot.hidden = true;
     return;
   }
