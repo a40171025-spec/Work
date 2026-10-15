@@ -1,0 +1,20 @@
+---
+import Icon from './Icon.astro';
+interface Props { solid?: boolean; }
+const { solid = false } = Astro.props;
+---
+<header class:list={['hdr', { 'is-solid': solid }]} id="hdr" data-theme="light" data-solid={solid ? 'always' : undefined}>
+  <div class="wrap hdr__in">
+    <a href="/" class="logo latin" aria-label="Paradise Watch, לדף הבית">Paradise <b>Watch</b></a>
+    <nav class="nav" aria-label="ניווט ראשי">
+      <a href="/#collection">קולקציה</a>
+      <a href="/shipping">משלוחים ותשלום</a>
+      <a href="/#faq">שאלות נפוצות</a>
+      <a href="/#contact">יצירת קשר</a>
+    </nav>
+    <button class="cart-btn" type="button" data-cart-open aria-haspopup="dialog" aria-controls="cart" aria-label="פתיחת הסל, 0 פריטים">
+      <Icon name="bag" />
+      <span class="cart-btn__n" data-cart-count hidden>0</span>
+    </button>
+  </div>
+</header>

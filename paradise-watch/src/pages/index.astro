@@ -1,0 +1,161 @@
+---
+import Base from '../layouts/Base.astro';
+import Loader from '../components/Loader.astro';
+import Hero from '../components/Hero.astro';
+import Film from '../components/Film.astro';
+import ProductCard from '../components/ProductCard.astro';
+import BoxCompare from '../components/BoxCompare.astro';
+import PriceMatch from '../components/PriceMatch.astro';
+import ShippingContent from '../components/ShippingContent.astro';
+import Icon from '../components/Icon.astro';
+import { faqs, HOME_TITLE, SEO_DESC } from '../data/content';
+import { products } from '../data/products';
+import { INSTAGRAM, INSTAGRAM_URL, PHONE_DISPLAY, SITE_URL, waLink } from '../data/site';
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+const listLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'הקולקציה',
+  itemListElement: products.map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE_URL}/products/${p.slug}`, name: p.name })),
+};
+const why = [
+  ['badge', 'בדיקת איכות לפני משלוח'],
+  ['truck', 'מסירה אישית עד הבית'],
+  ['chat', 'שירות אישי בוואטסאפ'],
+  ['cash', 'תשלום במזומן לשליח'],
+] as const;
+const counts = { all: products.length, men: products.filter((p) => p.gender === 'men').length, women: products.filter((p) => p.gender === 'women').length };
+---
+<Base title={HOME_TITLE} description={SEO_DESC} path="/" home jsonld={[faqLd, listLd]}>
+  <Loader slot="before" />
+
+  <Hero />
+  <Film />
+
+  <section id="collection" class="sec shop" data-header="light" aria-labelledby="collection-title">
+    <div class="wrap">
+      <header class="sec-head rv">
+        <p class="kicker" aria-hidden="true">Collection</p>
+        <h2 id="collection-title">הקולקציה</h2>
+        <div class="rule"></div>
+        <p>כל שעון: ₪299 עם קופסה ממותגת, או ₪199 בלי קופסה. בוחרים בעמוד השעון.</p>
+      </header>
+      <div class="filters" role="group" aria-label="סינון לפי קהל">
+        <button type="button" data-filter="all" aria-pressed="true">הכל <span class="latin">({counts.all})</span></button>
+        <button type="button" data-filter="men" aria-pressed="false">לגברים <span class="latin">({counts.men})</span></button>
+        <button type="button" data-filter="women" aria-pressed="false">לנשים <span class="latin">({counts.women})</span></button>
+      </div>
+      <p class="sr-only" aria-live="polite" data-shop-count></p>
+      <div class="grid">
+        {products.map((p) => <ProductCard p={p} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="sec sec--tight" data-header="light" aria-labelledby="deal-title">
+    <div class="wrap">
+      <div class="deal on-dark rv">
+        <p class="kicker">מבצע זוגי</p>
+        <h2 id="deal-title">2 שעונים עם קופסה ב־<em>₪499</em></h2>
+        <p>במקום <s>₪598</s>. ההנחה מחושבת אוטומטית בעגלה, בלי קוד קופון. חלה גם על שעונים בלי קופסה: 2 ב־₪332 במקום <s>₪398</s>.</p>
+        <div class="deal__grid">
+          <div class="deal__cell"><b>₪499</b><span>2 עם קופסה · במקום <s>₪598</s></span></div>
+          <div class="deal__cell"><b>₪332</b><span>2 בלי קופסה · במקום <s>₪398</s></span></div>
+        </div>
+        <a href="#collection" class="btn btn--gold">לבחירת שעונים</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="box" class="sec sec--tight" data-header="light" aria-labelledby="box-title">
+    <div class="wrap">
+      <header class="sec-head rv">
+        <p class="kicker" aria-hidden="true">Packaging</p>
+        <h2 id="box-title">שתי דרכים לקבל את השעון</h2>
+        <div class="rule"></div>
+        <p>אותו שעון בדיוק, ההבדל הוא רק באריזה.</p>
+      </header>
+      <div class="rv"><BoxCompare /></div>
+    </div>
+  </section>
+
+  <section class="sec sec--tight" data-header="light">
+    <div class="wrap rv"><PriceMatch /></div>
+  </section>
+
+  <section class="sec sec--tight" data-header="light" aria-labelledby="why-title">
+    <div class="wrap">
+      <header class="sec-head rv">
+        <p class="kicker" aria-hidden="true">Why us</p>
+        <h2 id="why-title">למה Paradise Watch</h2>
+        <div class="rule"></div>
+        <p>חנות שעונים שבנויה על פשטות, שירות אישי ותשומת לב לפרטים הקטנים.</p>
+      </header>
+      <ul class="why rv">
+        {why.map(([icon, text]) => (
+          <li><span class="ico"><Icon name={icon} /></span>{text}</li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section id="shipping" class="sec band" data-header="light" aria-labelledby="shipping-title">
+    <div class="wrap" style="max-width:820px">
+      <header class="sec-head rv">
+        <p class="kicker" aria-hidden="true">Delivery</p>
+        <h2 id="shipping-title">משלוחים ותשלום</h2>
+        <div class="rule"></div>
+        <p>פשוט, שקוף וללא הפתעות בדרך אליך.</p>
+      </header>
+      <div class="panel prose rv"><ShippingContent /></div>
+    </div>
+  </section>
+
+  <section id="faq" class="sec" data-header="light" aria-labelledby="faq-title">
+    <div class="wrap" style="max-width:820px">
+      <header class="sec-head rv">
+        <p class="kicker" aria-hidden="true">FAQ</p>
+        <h2 id="faq-title">שאלות נפוצות</h2>
+        <div class="rule"></div>
+      </header>
+      <div class="faq">
+        {faqs.map((f) => (
+          <details>
+            <summary>{f.q}<Icon name="chevron" /></summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </div>
+      <p class="center" style="margin-top:18px;font-size:14px"><a class="link" href="/cancel">לעמוד ביטול עסקה</a></p>
+    </div>
+  </section>
+
+  <section id="contact" class="sec sec--tight" data-header="light" aria-labelledby="contact-title">
+    <div class="wrap" style="display:grid;gap:20px">
+      <div class="support rv">
+        <div>
+          <h2>יש בעיה? קודם כול דברו איתנו</h2>
+          <p>שלחו הודעה בוואטסאפ <span class="latin" style="font-family:var(--he);font-weight:600;color:var(--ink)">{PHONE_DISPLAY}</span> ונפתור את זה אישית ומהר. אצלנו אף לקוח לא נשאר בלי מענה.</p>
+        </div>
+        <a href={waLink()} target="_blank" rel="noopener" class="btn btn--wa">דברו איתנו</a>
+      </div>
+      <div class="contact on-dark rv">
+        <h2 id="contact-title">יצירת קשר</h2>
+        <p>מעוניינים בשעון או צריכים עזרה? אנחנו זמינים בוואטסאפ ונשמח לעזור אישית.</p>
+        <div class="row">
+          <a href={waLink()} target="_blank" rel="noopener" class="btn btn--wa"><Icon name="chat" /> וואטסאפ <span class="latin" style="font-family:var(--he)">{PHONE_DISPLAY}</span></a>
+          <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" class="btn btn--ghost"><Icon name="instagram" /> <span class="latin">@{INSTAGRAM}</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import '../scripts/home';
+  </script>
+</Base>

@@ -1,0 +1,29 @@
+---
+import { card, PREORDER_BADGE, type Product } from '../data/products';
+import { ils, PRICE_BOX, PRICE_NO_BOX } from '../data/site';
+interface Props { p: Product; }
+const { p } = Astro.props;
+const c = card(p.slug);
+const href = `/products/${p.slug}`;
+---
+<article class="pcard" data-gender={p.gender}>
+  <a class="pcard__media" href={href} tabindex="-1" aria-hidden="true">
+    {p.photos ? (
+      <img src={c.src} srcset={c.srcset} sizes="(min-width: 1100px) 270px, (min-width: 720px) 31vw, 48vw" width={c.width} height={c.height} alt={`שעון ${p.name} — Paradise Watch`} loading="lazy" decoding="async" />
+    ) : (
+      <span class="noimg"><b>{p.name}</b><small>אין עדיין צילום באתר</small></span>
+    )}
+    <span class="badges">
+      {p.preorder && <span class="badge">{PREORDER_BADGE}</span>}
+      {p.gender === 'women' && <span class="badge badge--light">לנשים</span>}
+    </span>
+  </a>
+  <div class="pcard__body">
+    <h3 class="pcard__name"><a href={href}>{p.name}</a></h3>
+    <p class="pcard__price">{ils(PRICE_BOX)} <small>עם קופסה</small></p>
+    <p class="pcard__alt">{ils(PRICE_NO_BOX)} בלי קופסה</p>
+    {p.preorder && <p class="sr-only">{PREORDER_BADGE}</p>}
+    <div class="pcard__spacer"></div>
+    <button type="button" class="btn btn--dark btn--sm" data-add-to-cart data-slug={p.slug} data-box="1">הוספה לסל<span class="sr-only"> {p.name}</span></button>
+  </div>
+</article>

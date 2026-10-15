@@ -1,0 +1,26 @@
+---
+import Icon from './Icon.astro';
+import PriceMatch from './PriceMatch.astro';
+import { INSTAGRAM, INSTAGRAM_URL, PHONE_DISPLAY, waLink } from '../data/site';
+---
+<footer class="ftr on-dark">
+  <div class="wrap">
+    <div class="ftr__grid">
+      <div>
+        <p class="logo latin" style="opacity:1;margin:0">Paradise <b>Watch</b></p>
+        <p>שעונים במראה יוקרתי, במחיר נגיש. תשלום במזומן לשליח בעת המסירה.</p>
+      </div>
+      <nav aria-label="קישורי מידע">
+        <a href="/shipping">משלוחים ותשלום</a>
+        <a href="/cancel">ביטול עסקה</a>
+        <a href="/terms">תקנון</a>
+      </nav>
+      <div class="col">
+        <a href={waLink()} target="_blank" rel="noopener">וואטסאפ: <span class="latin">{PHONE_DISPLAY}</span></a>
+        <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" class="ig"><Icon name="instagram" /> <span class="latin">@{INSTAGRAM}</span></a>
+      </div>
+    </div>
+    <div class="ftr__pm"><PriceMatch variant="line" dark /></div>
+    <p class="ftr__copy">© 2026 Paradise Watch</p>
+  </div>
+</footer>

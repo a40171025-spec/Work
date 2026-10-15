@@ -1,0 +1,32 @@
+---
+import PolicyPage from '../components/PolicyPage.astro';
+import { PHONE_DISPLAY, waLink } from '../data/site';
+---
+<PolicyPage
+  title="ביטול עסקה | Paradise Watch"
+  heading="ביטול עסקה"
+  description="מדיניות ביטול עסקה ב־Paradise Watch: ביטול תוך 14 יום מקבלת השעון, שעון חדש באריזה המקורית. שעון פגום יוחלף או יזוכה במלואו."
+  path="/cancel"
+>
+  <section>
+    <h2>קודם כול — דברו איתנו</h2>
+    <p>לכל בעיה, פנו אלינו קודם בוואטסאפ <a href={waLink('שלום, אני מעוניין/ת לבטל עסקה')} class="latin" style="font-family:var(--he)">{PHONE_DISPLAY}</a> ונטפל בזה אישית ומהר.</p>
+  </section>
+  <section>
+    <h2>תנאי ביטול</h2>
+    <ul>
+      <li>ניתן לבטל את העסקה תוך 14 יום מיום קבלת השעון.</li>
+      <li>השעון צריך להיות חדש, ללא שימוש ובאריזה המקורית.</li>
+      <li>עלות משלוח ההחזרה חלה על הלקוח.</li>
+      <li>בביטול ינוכו דמי ביטול בשיעור 5% ממחיר העסקה.</li>
+    </ul>
+  </section>
+  <section>
+    <h2>שעון פגום</h2>
+    <p>שעון שהגיע פגום יוחלף בשעון תקין או יזוכה במלואו.</p>
+  </section>
+  <section>
+    <h2>איך מבטלים?</h2>
+    <p>שלחו לנו הודעה בוואטסאפ עם שם, טלפון ופרטי ההזמנה, ונתאם יחד את ההחזרה וההחזר הכספי.</p>
+  </section>
+</PolicyPage>

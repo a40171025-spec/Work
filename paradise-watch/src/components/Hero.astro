@@ -1,0 +1,82 @@
+---
+import Icon from './Icon.astro';
+import manifest from '../data/hero-manifest.json';
+import { getProduct, HERO_SLUG, spec } from '../data/products';
+import { ROT_END } from '../data/scenes';
+import { boxLabel, ils, PRICE_BOX, PRICE_NO_BOX, waLink } from '../data/site';
+
+const p = getProduct(HERO_SLUG)!;
+const b = manifest.base;
+const full = manifest.fullRotation;
+const at = (deg: number) => +(ROT_END * deg / 360).toFixed(4);
+const pad = (n: number) => String(n).padStart(3, '0');
+const cards = [
+  { pos: 'a', deg: 40, out: at(112) },
+  { pos: 'b', deg: 128, out: at(200) },
+  { pos: 'c', deg: 216, out: at(288) },
+  { pos: 'd', deg: 300, out: +(ROT_END + 0.035).toFixed(4) },
+];
+const gender = p.gender === 'women' ? 'שעון לנשים' : 'שעון לגברים';
+const label = full
+  ? `שעון ${p.name} מסתובב 360 מעלות לפי הגלילה`
+  : `שעון ${p.name} בקופסה, המצלמה מתקרבת לפי הגלילה`;
+const waText = `שלום Paradise Watch! אשמח להזמין:\n${p.name} — ${boxLabel(true)} (${ils(PRICE_BOX)})`;
+---
+<section class="hero" id="top" data-header="light" data-bare data-mode="scrub" aria-label="פתיחה">
+  <div class="hero__stage">
+    <picture class="hero__poster">
+      <source media="(max-aspect-ratio: 4/5)" srcset={`${b}m/0000.webp`} width={manifest.mobile.w} height={manifest.mobile.h} />
+      <img src={`${b}d/0000.webp`} width={manifest.desktop.w} height={manifest.desktop.h} alt="" fetchpriority="high" decoding="async" />
+    </picture>
+    <canvas class="hero__canvas" role="img" aria-label={label}></canvas>
+    <video class="hero__loop" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
+    <div class="hero__veil" aria-hidden="true"></div>
+
+    <p class="hero__title" aria-hidden="true"><span>Paradise</span> <span>Watch</span></p>
+
+    <div class="hero__intro">
+      <p class="eyebrow">שעוני יוקרה · דור חדש</p>
+      <h1>שעונים במראה יוקרתי, <em>במחיר נגיש</em></h1>
+      <p class="hero__lead">קולקציית Paradise Watch לגברים ולנשים — לא רק אביזר, חתימה אישית.</p>
+      <div class="hero__actions">
+        <a href="#collection" class="btn btn--gold">לקולקציה</a>
+        <a href={waLink('שלום Paradise Watch, אשמח להזמין שעון')} target="_blank" rel="noopener" class="btn btn--glass"><Icon name="chat" /> הזמנה בוואטסאפ</a>
+      </div>
+      <p class="hero__note">₪299 עם קופסה · ₪199 בלי · 2 ב־₪499</p>
+    </div>
+
+    <div class="hero__cards">
+      <article class="gcard glass" data-pos="a" data-in={at(cards[0].deg)} data-out={cards[0].out} aria-label="הדגם">
+        <p class="gcard__k"><span>הדגם</span>{full && <span class="latin">{pad(cards[0].deg)}°</span>}</p>
+        <p class="gcard__v latin">{p.name}</p>
+        <p class="gcard__s">{gender}{p.preorder ? ' · הזמנה מראש' : ''}</p>
+      </article>
+      <article class="gcard glass" data-pos="b" data-in={at(cards[1].deg)} data-out={cards[1].out} aria-label="החוגה">
+        <p class="gcard__k"><span>החוגה</span>{full && <span class="latin">{pad(cards[1].deg)}°</span>}</p>
+        <p class="gcard__v">{spec(p, 'חוגה') ?? spec(p, 'גוון')}</p>
+      </article>
+      <article class="gcard glass" data-pos="c" data-in={at(cards[2].deg)} data-out={cards[2].out} aria-label="הצמיד">
+        <p class="gcard__k"><span>הצמיד</span>{full && <span class="latin">{pad(cards[2].deg)}°</span>}</p>
+        <p class="gcard__v">{spec(p, 'רצועה')}</p>
+      </article>
+      <article class="gcard glass" data-pos="d" data-in={at(cards[3].deg)} data-out={cards[3].out} aria-label="המחיר">
+        <p class="gcard__k"><span>המחיר</span>{full && <span class="latin">{pad(cards[3].deg)}°</span>}</p>
+        <p class="gcard__v">{ils(PRICE_BOX)} <span style="font-size:15px">עם קופסה ממותגת</span></p>
+        <p class="gcard__s">{ils(PRICE_NO_BOX)} בלי קופסה · 2 ב־₪499</p>
+        <div class="gcard__btns">
+          <button type="button" class="btn btn--dark btn--sm" data-add-to-cart data-slug={p.slug} data-box="1">הוספה לסל</button>
+          <a class="btn btn--wa btn--sm" href={waLink(waText)} target="_blank" rel="noopener">וואטסאפ</a>
+        </div>
+      </article>
+    </div>
+
+    <div class="hero__meter" aria-hidden="true">
+      <div class="hero__deg"><span data-deg>000</span>{full ? <sup>°</sup> : <sup>%</sup>}</div>
+      <div class="hero__bar"><i></i></div>
+      <p class="hero__label">{full ? 'Rotation · 360°' : 'Scroll'}</p>
+    </div>
+    <div class="hero__hint" aria-hidden="true"><span>גללו</span><i></i></div>
+    <div class="hero__portal" aria-hidden="true"><p>נכנסים פנימה.</p></div>
+  </div>
+  <script type="application/json" id="hero-data" set:html={JSON.stringify(manifest)} />
+</section>

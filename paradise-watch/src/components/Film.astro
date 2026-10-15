@@ -1,0 +1,103 @@
+---
+import { card, FILM_SLUGS, getProduct, products } from '../data/products';
+import { ils, PRICE_BOX, PRICE_NO_BOX } from '../data/site';
+
+const stops = FILM_SLUGS.map((s) => getProduct(s)!).filter(Boolean);
+const N = stops.length;
+const pad = (n: number) => String(n).padStart(2, '0');
+
+/** "Regent Rose Emerald" -> ["Regent Rose", "Emerald"] so giant names stay on screen */
+const lines = (name: string) => {
+  if (name.length <= 13) return [name];
+  const w = name.split(' ');
+  let best = [name], score = Infinity;
+  for (let i = 1; i < w.length; i++) {
+    const a = w.slice(0, i).join(' '), b = w.slice(i).join(' ');
+    const s = Math.max(a.length, b.length);
+    if (s < score) { score = s; best = [a, b]; }
+  }
+  return best;
+};
+
+// soft out-of-focus lights, placed with a fixed seed so every build looks the same
+let seed = 7;
+const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+const lights = Array.from({ length: 14 }, () => ({
+  x: rnd(), y: 8 + rnd() * 70, size: 30 + rnd() * 120, d: 0.25 + rnd() * 0.9, o: 0.25 + rnd() * 0.5,
+}));
+---
+<section class="film on-dark" id="film" data-header="dark" data-bare style={`--stops:${N}`} aria-labelledby="film-title">
+  <div class="film__stage">
+    <div class="film__bokeh" aria-hidden="true">
+      {lights.map((l) => (
+        <span data-x={l.x.toFixed(3)} data-d={l.d.toFixed(2)} style={`top:${l.y.toFixed(1)}%;width:${l.size.toFixed(0)}px;height:${l.size.toFixed(0)}px;opacity:${l.o.toFixed(2)}`}></span>
+      ))}
+    </div>
+    <div class="film__beam" aria-hidden="true"></div>
+    <div class="film__floor" aria-hidden="true"></div>
+    <div class="film__pool" aria-hidden="true"></div>
+
+    <div class="film__names" aria-hidden="true">
+      {stops.map((p) => (
+        <p class="film__name">{lines(p.name).map((l) => <span>{l}</span>)}</p>
+      ))}
+    </div>
+
+    <div class="film__stops" aria-hidden="true">
+      {stops.map((p) => {
+        const c = card(p.slug);
+        return (
+          <figure class="stop">
+            <div class="stop__img"><img data-src={c.src} alt="" width={c.width} height={c.height} decoding="async" /></div>
+            <div class="stop__refl"><img data-src={c.src} alt="" width={c.width} height={c.height} decoding="async" /></div>
+          </figure>
+        );
+      })}
+    </div>
+
+    <div class="film__intro">
+      <h2 id="film-title"><span class="big latin" aria-hidden="true">The Collection</span><span class="sr-only">הקולקציה מקרוב</span></h2>
+      <p>{N} דגמים, מקרוב.</p>
+    </div>
+
+    <div class="film__info">
+      {stops.map((p, i) => (
+        <article class="finfo glass glass--dark" aria-labelledby={`finfo-${p.slug}`}>
+          <p class="finfo__n">{pad(i + 1)} / {pad(N)}</p>
+          <h3 id={`finfo-${p.slug}`}>{p.name}</h3>
+          <p>{p.description}</p>
+          <p class="finfo__price"><strong>{ils(PRICE_BOX)}</strong><span>עם קופסה ממותגת · {ils(PRICE_NO_BOX)} בלי קופסה</span></p>
+          <div class="finfo__btns">
+            <button type="button" class="btn btn--gold btn--sm" data-add-to-cart data-slug={p.slug} data-box="1">הוספה לסל</button>
+            <a class="btn btn--ghost btn--sm" href={`/products/${p.slug}`}>לפרטים<span class="sr-only"> על {p.name}</span></a>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <div class="film__outro">
+      <p class="big latin" aria-hidden="true">The full collection</p>
+      <p>{products.length} דגמים · {ils(PRICE_BOX)} עם קופסה · {ils(PRICE_NO_BOX)} בלי</p>
+      <a href="#collection" class="btn btn--gold">לכל הקולקציה</a>
+    </div>
+
+    <div class="film__meter" aria-hidden="true"><b data-film-n>01</b>/ {pad(N)}<i></i></div>
+    <a class="film__all" href="#collection">לכל הקולקציה ←</a>
+
+    <div class="film__static">
+      {stops.map((p) => {
+        const c = card(p.slug);
+        return (
+          <article class="fstatic">
+            <img data-src={c.src} alt={`שעון ${p.name} — Paradise Watch`} width={c.width} height={c.height} loading="lazy" decoding="async" />
+            <h3>{p.name}</h3>
+            <p>{p.description}</p>
+            <p><strong>{ils(PRICE_BOX)}</strong> עם קופסה ממותגת · {ils(PRICE_NO_BOX)} בלי קופסה</p>
+            <button type="button" class="btn btn--gold btn--sm" data-add-to-cart data-slug={p.slug} data-box="1">הוספה לסל</button>
+          </article>
+        );
+      })}
+    </div>
+    <div class="film__fade" aria-hidden="true"></div>
+  </div>
+</section>

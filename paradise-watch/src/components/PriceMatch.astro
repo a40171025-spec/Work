@@ -1,0 +1,22 @@
+---
+import Icon from './Icon.astro';
+import { PRICE_SUB, PRICE_TITLE } from '../data/content';
+import { waLink } from '../data/site';
+interface Props { variant?: 'strip' | 'line'; dark?: boolean; }
+const { variant = 'strip', dark = false } = Astro.props;
+---
+{variant === 'strip' ? (
+  <div class="pm">
+    <span class="seal"><Icon name="badge" /></span>
+    <div>
+      <h2>{PRICE_TITLE}</h2>
+      <p>{PRICE_SUB}</p>
+    </div>
+    <a href={waLink('שלום Paradise Watch, מצאתי את השעון במחיר זול יותר:')} target="_blank" rel="noopener noreferrer" class="btn btn--wa">שלחו לנו בוואטסאפ</a>
+  </div>
+) : (
+  <div class="pmline" style={dark ? 'border-color: rgba(201,162,74,.3)' : 'background:#f8f1df'}>
+    <span class="seal seal--sm"><Icon name="badge" /></span>
+    <p><b>{PRICE_TITLE}.</b> <span style={dark ? 'opacity:.8' : 'color:var(--muted)'}>{PRICE_SUB}</span></p>
+  </div>
+)}

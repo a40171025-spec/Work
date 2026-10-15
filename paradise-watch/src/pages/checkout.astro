@@ -1,0 +1,63 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+---
+<Base title="השלמת הזמנה | Paradise Watch" description="השלמת הזמנה ב־Paradise Watch ושליחה בוואטסאפ. תשלום במזומן לשליח בעת המסירה." path="/checkout" noindex>
+  <div class="page">
+    <div class="wrap">
+      <div data-co-empty hidden class="done">
+        <h1>הסל ריק</h1>
+        <a href="/#collection" class="btn btn--gold">לקולקציה</a>
+      </div>
+
+      <div data-co-done hidden class="done" tabindex="-1">
+        <h1>כמעט סיימנו ✨</h1>
+        <p>ההזמנה נפתחה בוואטסאפ. ההזמנה מאושרת רק לאחר אישור שלנו בוואטסאפ.</p>
+        <a data-co-link href="#" target="_blank" rel="noopener" class="btn btn--wa"><Icon name="chat" /> לא נפתח? לחצו לשליחה בוואטסאפ</a>
+      </div>
+
+      <div class="co" data-co-main hidden>
+        <form novalidate data-co-form>
+          <h1>פרטי משלוח</h1>
+          <p style="font-size:14px;color:var(--muted)">משלוח למרכז ולדרום (כולל ירושלים ומודיעין). לאזורים אחרים — רק בתיאום מראש בוואטסאפ.</p>
+          <div class="field">
+            <label for="name">שם מלא</label>
+            <input id="name" name="name" type="text" autocomplete="name" required maxlength="100" aria-describedby="name-err" />
+            <p class="err" id="name-err" hidden></p>
+          </div>
+          <div class="field">
+            <label for="phone">טלפון</label>
+            <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="15" aria-describedby="phone-err" />
+            <p class="err" id="phone-err" hidden></p>
+          </div>
+          <div class="field">
+            <label for="city">עיר</label>
+            <input id="city" name="city" type="text" autocomplete="address-level2" required maxlength="100" aria-describedby="city-err" />
+            <p class="err" id="city-err" hidden></p>
+          </div>
+          <div class="field">
+            <label for="address">כתובת (רחוב, מספר, דירה)</label>
+            <input id="address" name="address" type="text" autocomplete="street-address" required maxlength="200" aria-describedby="address-err" />
+            <p class="err" id="address-err" hidden></p>
+          </div>
+          <div class="field">
+            <label for="notes">הערות (לא חובה)</label>
+            <textarea id="notes" name="notes" rows="3" maxlength="1000"></textarea>
+          </div>
+          <p class="cash">💵 תשלום במזומן לשליח בעת המסירה בלבד. ההזמנה מאושרת רק לאחר אישור שלנו בוואטסאפ.</p>
+          <button type="submit" class="btn btn--wa btn--block"><Icon name="chat" /> שליחת ההזמנה בוואטסאפ</button>
+          <p class="center" style="font-size:12.5px;color:var(--muted)">בשליחה אתם מאשרים את <a class="link" href="/terms">התקנון</a>.</p>
+        </form>
+        <aside aria-labelledby="co-sum-title">
+          <h2 id="co-sum-title">סיכום הזמנה</h2>
+          <ul class="co__lines" data-co-lines></ul>
+          <dl class="sum" data-co-sum></dl>
+        </aside>
+      </div>
+      <noscript><p class="center">כדי להשלים הזמנה צריך להפעיל JavaScript, או לשלוח לנו הודעה בוואטסאפ 053-532-5643.</p></noscript>
+    </div>
+  </div>
+  <script>
+    import '../scripts/checkout';
+  </script>
+</Base>

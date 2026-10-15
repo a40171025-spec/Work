@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+import { PHONE_DISPLAY, waLink } from '../data/site';
+interface Props { title: string; heading: string; description: string; path: string; }
+const { title, heading, description, path } = Astro.props;
+---
+<Base title={title} description={description} path={path}>
+  <div class="page">
+    <article class="wrap policy">
+      <h1>{heading}</h1>
+      <div class="rule"></div>
+      <div class="prose"><slot /></div>
+      <div class="policy__help">
+        <p>יש שאלה או בעיה? קודם כול דברו איתנו.</p>
+        <a href={waLink()} target="_blank" rel="noopener" class="btn btn--wa btn--sm">וואטסאפ <span class="latin" style="font-family:var(--he)">{PHONE_DISPLAY}</span></a>
+      </div>
+    </article>
+  </div>
+</Base>

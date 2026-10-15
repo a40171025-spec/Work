@@ -1,0 +1,28 @@
+---
+// Inline SVG icons (Lucide, ISC licence). Decorative: hidden from screen readers.
+import bag from 'lucide-static/icons/shopping-bag.svg?raw';
+import chat from 'lucide-static/icons/message-circle.svg?raw';
+import badge from 'lucide-static/icons/badge-check.svg?raw';
+import cash from 'lucide-static/icons/banknote.svg?raw';
+import truck from 'lucide-static/icons/truck.svg?raw';
+import chevron from 'lucide-static/icons/chevron-down.svg?raw';
+import minus from 'lucide-static/icons/minus.svg?raw';
+import plus from 'lucide-static/icons/plus.svg?raw';
+import x from 'lucide-static/icons/x.svg?raw';
+import arrow from 'lucide-static/icons/arrow-left.svg?raw';
+import check from 'lucide-static/icons/check.svg?raw';
+
+const instagram = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.6" cy="6.4" r="0.6" fill="currentColor" stroke="none"/></svg>`;
+
+const icons = { bag, chat, badge, cash, truck, chevron, minus, plus, x, arrow, check, instagram } as const;
+export type IconName = keyof typeof icons;
+
+interface Props { name: IconName; class?: string; }
+const { name, class: cls } = Astro.props;
+const svg = icons[name]
+  .replace(/<!--.*?-->/s, '')
+  .replace('<svg', '<svg aria-hidden="true" focusable="false"')
+  .replace(/\s+class="[^"]*"/, '')
+  .trim();
+---
+<span class:list={['icon', cls]} set:html={svg} />

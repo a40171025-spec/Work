@@ -1,0 +1,136 @@
+---
+import Base from '../../layouts/Base.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import PriceMatch from '../../components/PriceMatch.astro';
+import Icon from '../../components/Icon.astro';
+import { BOX_COPY } from '../../data/content';
+import { absolutePhoto, ogImage, photo, PREORDER_BADGE, products, type Product } from '../../data/products';
+import { boxLabel, ils, PRICE_BOX, PRICE_NO_BOX, SITE_URL, waLink } from '../../data/site';
+
+export function getStaticPaths() {
+  return products.map((p) => ({ params: { slug: p.slug }, props: { p } }));
+}
+interface Props { p: Product; }
+const { p } = Astro.props;
+
+const title = `${p.name} | שעון ב־₪299 עם קופסה | Paradise Watch`;
+const desc = `${p.name}${p.preorder ? ' (הזמנה מראש)' : ''}: ₪299 עם קופסה ממותגת, ₪199 בלי. 2 ב־₪499. משלוח במרכז ובדרום, מזומן לשליח.`;
+const path = `/products/${p.slug}`;
+const img = absolutePhoto(p);
+const photos = Array.from({ length: p.photos }, (_, i) => photo(p.slug, i + 1));
+const related = products.filter((x) => x.slug !== p.slug && x.gender === p.gender).slice(0, 4);
+const waText = (withBox: boolean) => `שלום Paradise Watch! אשמח להזמין:\n${p.name} — ${boxLabel(withBox)} (${ils(withBox ? PRICE_BOX : PRICE_NO_BOX)})`;
+
+const productLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: p.name,
+  description: p.description,
+  brand: { '@type': 'Brand', name: 'Paradise Watch' },
+  ...(img ? { image: photos.map((_, i) => `${SITE_URL}/assets/img/w/${p.slug}-${i + 1}.webp`) } : {}),
+  url: `${SITE_URL}${path}`,
+  offers: {
+    '@type': 'AggregateOffer',
+    priceCurrency: 'ILS',
+    lowPrice: PRICE_NO_BOX,
+    highPrice: PRICE_BOX,
+    offerCount: 2,
+    availability: p.preorder ? 'https://schema.org/PreOrder' : 'https://schema.org/InStock',
+    acceptedPaymentMethod: 'http://purl.org/goodrelations/v1#Cash',
+  },
+};
+const crumbsLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'ראשי', item: `${SITE_URL}/` },
+    { '@type': 'ListItem', position: 2, name: 'קולקציה', item: `${SITE_URL}/#collection` },
+    { '@type': 'ListItem', position: 3, name: p.name, item: `${SITE_URL}${path}` },
+  ],
+};
+---
+<Base title={title} description={desc} path={path} ogImage={ogImage(p)} ogType="product" jsonld={[productLd, crumbsLd]}>
+  <div class="page">
+    <div class="wrap">
+      <nav aria-label="פירורי לחם" class="crumbs">
+        <a href="/">ראשי</a> / <a href="/#collection">קולקציה</a> / <span class="latin" style="color:var(--ink)">{p.name}</span>
+      </nav>
+      <div class="product" data-product={p.slug}>
+        <div class="gallery">
+          <div class="gallery__main">
+            {photos.length ? (
+              <img data-main src={photos[0].src} srcset={photos[0].srcset} sizes="(min-width: 900px) 52vw, 100vw" width={1200} height={1600} alt={`שעון ${p.name} — תמונה 1`} fetchpriority="high" decoding="async" />
+            ) : (
+              <span class="noimg"><b>{p.name}</b><small>אין עדיין צילום באתר</small></span>
+            )}
+            {p.preorder && <span class="badges"><span class="badge">{PREORDER_BADGE}</span></span>}
+          </div>
+          {photos.length > 1 && (
+            <div class="thumbs" role="group" aria-label="תמונות נוספות">
+              {photos.map((ph, i) => (
+                <button type="button" data-thumb={i} data-src={ph.src} data-srcset={ph.srcset} aria-pressed={i === 0 ? 'true' : 'false'} aria-label={`תמונה ${i + 1}`}>
+                  <img src={ph.src.replace('.webp', '-600.webp')} alt="" width="72" height="96" loading="lazy" decoding="async" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div class="pinfo">
+          <h1>{p.name}</h1>
+          <p class="sub">{p.gender === 'women' ? 'שעון לנשים' : 'שעון לגברים'}{p.preorder ? ' · הזמנה מראש, עד 21 ימי עסקים' : ' · במלאי, עד 5 ימי עסקים'}</p>
+          <p class="price" data-price>{ils(PRICE_BOX)}</p>
+          <p class="desc">{p.description}</p>
+
+          <fieldset class="choice">
+            <legend>אריזה</legend>
+            <div class="choice__grid">
+              <label class="opt">
+                <input type="radio" name="box" value="0" />
+                <span class="boxart" aria-hidden="true"><i></i><b></b></span>
+                <strong>קופסה קטנה ורגילה – ₪199</strong>
+                <span class="t">{BOX_COPY.plain.title}</span>
+                <span>{BOX_COPY.plain.text}</span>
+              </label>
+              <label class="opt">
+                <input type="radio" name="box" value="1" checked />
+                <span class="tag">הכי פופולרי</span>
+                <span class="boxart boxart--brand" aria-hidden="true"><i></i><b></b></span>
+                <strong>קופסה ממותגת – ₪299</strong>
+                <span class="t">{BOX_COPY.brand.title}</span>
+                <span>{BOX_COPY.brand.text}</span>
+              </label>
+            </div>
+          </fieldset>
+          <p class="note" data-deal>🎁 מבצע זוגי: 2 בקופסה ממותגת ב־₪499 — אוטומטית בעגלה.</p>
+
+          <div class="buy">
+            <button type="button" class="btn btn--gold" data-add-to-cart data-slug={p.slug} data-box="1" data-box-from="[data-product] input[name=box]">הוספה לסל</button>
+            <a class="btn btn--wa" data-wa href={waLink(waText(true))} data-wa-box={waLink(waText(true))} data-wa-plain={waLink(waText(false))} target="_blank" rel="noopener"><Icon name="chat" /> הזמנה בוואטסאפ</a>
+          </div>
+          <div style="margin-top:14px"><PriceMatch variant="line" /></div>
+          <p class="fine">תשלום במזומן לשליח בעת המסירה · משלוח במרכז ובדרום ₪50, חינם מ־3 שעונים</p>
+
+          <section class="specs" aria-labelledby="specs-title">
+            <h2 id="specs-title">מפרט</h2>
+            <dl>
+              {p.specs.map((s) => (
+                <div><dt>{s.label}</dt><dd>{s.value}</dd></div>
+              ))}
+            </dl>
+          </section>
+        </div>
+      </div>
+
+      {related.length > 0 && (
+        <section class="related" aria-labelledby="related-title">
+          <h2 id="related-title">אולי תאהבו גם</h2>
+          <div class="grid">{related.map((r) => <ProductCard p={r} />)}</div>
+        </section>
+      )}
+    </div>
+  </div>
+  <script>
+    import '../../scripts/product';
+  </script>
+</Base>

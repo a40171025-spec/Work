@@ -1,0 +1,17 @@
+---
+import Icon from './Icon.astro';
+---
+<div class="drawer" id="cart" data-lenis-prevent>
+  <div class="drawer__scrim" data-cart-close></div>
+  <aside class="drawer__panel" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+    <div class="drawer__head">
+      <h2 id="cart-title" tabindex="-1">הסל שלך</h2>
+      <button type="button" class="iconbtn" data-cart-close aria-label="סגירת הסל"><Icon name="x" /></button>
+    </div>
+    <div class="drawer__body" data-cart-body></div>
+    <div class="drawer__foot" data-cart-foot hidden>
+      <dl class="sum" data-cart-sum></dl>
+      <a href="/checkout" class="btn btn--gold btn--block">להשלמת ההזמנה</a>
+    </div>
+  </aside>
+</div>

@@ -1,0 +1,19 @@
+---
+import { BOX_COPY } from '../data/content';
+import { ils, PRICE_BOX, PRICE_NO_BOX } from '../data/site';
+---
+<div class="boxes">
+  <div class="boxc">
+    <span class="boxart" aria-hidden="true"><i></i><b></b></span>
+    <p class="boxc__price">{ils(PRICE_NO_BOX)}</p>
+    <p class="boxc__title">{BOX_COPY.plain.title}</p>
+    <p class="boxc__text">{BOX_COPY.plain.text}</p>
+  </div>
+  <div class="boxc boxc--brand">
+    <span class="tag">הכי פופולרי</span>
+    <span class="boxart boxart--brand" aria-hidden="true"><i></i><b></b></span>
+    <p class="boxc__price">{ils(PRICE_BOX)}</p>
+    <p class="boxc__title">{BOX_COPY.brand.title}</p>
+    <p class="boxc__text">{BOX_COPY.brand.text}</p>
+  </div>
+</div>
