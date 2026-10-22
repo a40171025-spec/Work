@@ -2,9 +2,6 @@
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 
-/assets/hero/*
-  Cache-Control: public, max-age=31536000, immutable
-
 /assets/img/*
   Cache-Control: public, max-age=604800
 

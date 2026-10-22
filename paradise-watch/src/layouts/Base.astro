@@ -17,9 +17,8 @@ interface Props {
   ogType?: string;
   noindex?: boolean;
   jsonld?: object[];
-  home?: boolean;
 }
-const { title, description, path, ogImage = `${SITE_URL}/assets/img/og/aurelia-turquoise.jpg`, ogType = 'website', noindex = false, jsonld = [], home = false } = Astro.props;
+const { title, description, path, ogImage = `${SITE_URL}/assets/img/og/aurelia-turquoise.jpg`, ogType = 'website', noindex = false, jsonld = [] } = Astro.props;
 const canonical = `${SITE_URL}${path}`;
 
 const store = {
@@ -66,8 +65,7 @@ const catalog = Object.fromEntries(
   </head>
   <body>
     <a class="skip" href="#main">דלגו לתוכן</a>
-    <slot name="before" />
-    <Header solid={!home} />
+    <Header solid />
     <main id="main" tabindex="-1">
       <slot />
     </main>

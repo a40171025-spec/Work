@@ -192,29 +192,12 @@ const setCart = (page, lines) => page.evaluate((l) => { localStorage.setItem('pw
     assert.equal((xml.match(/<loc>/g) || []).length, 21);
   });
 
-  // ---- keyboard: hero card button scrolls its moment into view ----
-  await check('keyboard focus on a hidden hero card brings it on screen', async () => {
-    const p2 = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-    await p2.goto(BASE + '/');
-    await p2.waitForFunction(() => !document.querySelector('.loader'), null, { timeout: 15000 });
-    await p2.focus('.gcard[data-pos="d"] [data-add-to-cart]');
-    await p2.waitForTimeout(1200);
-    const op = await p2.$eval('.gcard[data-pos="d"]', (el) => Number(getComputedStyle(el).opacity));
-    assert.ok(op > 0.6, `opacity ${op}`);
-    await p2.keyboard.press('Enter');
-    await p2.waitForSelector('#cart.is-open');
-    const lines = await p2.evaluate(() => JSON.parse(localStorage.getItem('pw-cart')));
-    assert.deepEqual(lines, [{ slug: 'aurelia-turquoise', withBox: true, qty: 1 }]);
-    await p2.close();
-  });
-
   // ---- phone: two taps from the opening to the cart ----
   await check('iPhone: "לקולקציה" then "הוספה לסל" opens the cart', async () => {
     const ctx = await browser.newContext({ ...devices['iPhone 13'], viewport: { width: 390, height: 844 } });
     const p3 = await ctx.newPage();
     await p3.goto(BASE + '/');
-    await p3.waitForFunction(() => !document.querySelector('.loader'), null, { timeout: 15000 });
-    await p3.tap('.hero__actions a[href="#collection"]');
+    await p3.tap('.intro__actions a[href="#collection"]');
     await p3.waitForTimeout(700);
     const top = await p3.$eval('#collection', (el) => el.getBoundingClientRect().top);
     assert.ok(Math.abs(top - 64) < 80, `collection top ${top}`);
@@ -232,13 +215,6 @@ const setCart = (page, lines) => page.evaluate((l) => { localStorage.setItem('pw
     for (const f of ['order-id', 'name', 'phone', 'city', 'address', 'items', 'total', 'notes']) {
       assert.ok(html.includes(`name="${f}"`), `field ${f}`);
     }
-  });
-
-  await check('opening frames stay under 8 MB (desktop + phone together)', async () => {
-    await page.goto(BASE + '/');
-    const m = JSON.parse(await page.textContent('#hero-data'));
-    const total = m.desktop.bytes + m.mobile.bytes;
-    assert.ok(total < 8 * 1024 * 1024, `${(total / 1048576).toFixed(2)} MB`);
   });
 
   // ---- phone menu ----

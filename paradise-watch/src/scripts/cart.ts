@@ -1,7 +1,6 @@
 // Cart: stored in localStorage (same key as the old site), drawer UI, add-to-cart buttons.
 import { calcTotals, type CartLine, type Totals } from '../data/pricing';
 import { boxLabel, ils, PRICE_BOX, PRICE_NO_BOX } from '../data/site';
-import { lenis } from './engine';
 import minusSvg from 'lucide-static/icons/minus.svg?raw';
 import plusSvg from 'lucide-static/icons/plus.svg?raw';
 
@@ -141,14 +140,12 @@ export function openCart() {
   lastFocus = document.activeElement as HTMLElement;
   drawer.classList.add('is-open');
   document.documentElement.classList.add('drawer-open');
-  lenis?.stop();
   requestAnimationFrame(() => drawer.querySelector<HTMLElement>('#cart-title')?.focus());
 }
 export function closeCart(restoreFocus = true) {
   if (!drawer?.classList.contains('is-open')) return;
   drawer.classList.remove('is-open');
   document.documentElement.classList.remove('drawer-open');
-  lenis?.start();
   if (restoreFocus) lastFocus?.focus?.({ preventScroll: true });
 }
 

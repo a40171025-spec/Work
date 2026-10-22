@@ -72,18 +72,8 @@ export const getProduct = (slug: string) => products.find((p) => p.slug === slug
 
 export const PREORDER_BADGE = 'הזמנה מראש · עד 21 ימי עסקים';
 
-/** The watch in the opening video, used for the glass cards. */
+/** The watch in the home page photo. */
 export const HERO_SLUG = 'aurelia-turquoise';
-
-/** Watches in the dark "collection film", in order. */
-export const FILM_SLUGS = [
-  'regent-rose-emerald',
-  'monarch-ice',
-  'paradise-skeleton-noir',
-  'regent-two-tone',
-  'marina-orange',
-  'petite-roma',
-];
 
 export const spec = (p: Product, label: string) => p.specs.find((s) => s.label === label)?.value;
 
