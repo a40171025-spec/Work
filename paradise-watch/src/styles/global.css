@@ -52,6 +52,8 @@ body {
   overflow-x: clip;
 }
 img, video, canvas, svg { display: block; max-width: 100%; }
+/* `hidden` must win over layout classes (e.g. the checkout grid stayed visible with an empty cart) */
+[hidden] { display: none !important; }
 a { color: inherit; }
 button, input, textarea, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
@@ -154,6 +156,28 @@ ul { margin: 0; padding: 0; }
   display: grid; place-items: center; font: 700 11px/1 var(--he); background: var(--grad-gold); color: var(--espresso);
 }
 .cart-btn__n[hidden] { display: none; }
+
+/* phone menu: the header links in a panel under the bar */
+.hdr__btns { display: flex; align-items: center; gap: 10px; }
+.menu-btn {
+  display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid rgba(42, 31, 23, 0.16); background: rgba(251, 248, 242, 0.78); color: var(--ink);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.hdr[data-theme='dark'] .menu-btn { background: rgba(20, 14, 10, 0.45); border-color: rgba(244, 238, 226, 0.24); color: var(--cream); }
+.menu-btn .i-close, .menu-btn[aria-expanded='true'] .i-open { display: none; }
+.menu-btn[aria-expanded='true'] .i-close { display: block; }
+.menu {
+  position: absolute; top: 100%; inset-inline: 0; z-index: 1; max-height: calc(100vh - var(--hdr-h)); overflow-y: auto;
+  padding: 6px var(--gutter) 22px; background: rgba(244, 238, 226, 0.97); color: var(--ink);
+  border-bottom: 1px solid var(--line); box-shadow: 0 30px 60px -30px rgba(42, 31, 23, 0.45);
+}
+.menu[hidden] { display: none; }
+.menu nav { display: grid; }
+.menu__link { padding: 15px 2px; font-size: 19px; font-weight: 500; text-decoration: none; border-bottom: 1px solid var(--line); }
+.menu__small { display: flex; gap: 22px; padding: 16px 2px 18px; font-size: 14px; }
+.menu__small a { color: var(--muted); }
+@media (min-width: 900px) { .menu-btn, .menu { display: none !important; } }
 
 /* ---------- loader ---------- */
 .loader { display: none; }
@@ -306,7 +330,13 @@ html.is-loading, html.is-loading body { overflow: hidden; }
     font-size: clamp(48px, 16.5vw, 120px); line-height: 0.95;
   }
   .hero__title span { display: block; }
-  .hero__intro { inset-inline: 20px; width: auto; top: auto; bottom: calc(82px + env(safe-area-inset-bottom)); display: block; }
+  /* the stage is 100vh (= the tallest viewport on iPhone Safari); "+ 100lvh - 100svh" lifts bottom
+     content above Safari's toolbar while it is showing. Browsers without lvh/svh keep the first value. */
+  .hero__intro {
+    inset-inline: 20px; width: auto; top: auto; display: block;
+    bottom: calc(82px + env(safe-area-inset-bottom));
+    bottom: calc(82px + env(safe-area-inset-bottom) + 100lvh - 100svh);
+  }
   .hero h1 { font-size: clamp(30px, 8.4vw, 40px); }
   .hero__lead { display: none; }
   .hero__actions { margin-top: 18px; }
@@ -316,7 +346,11 @@ html.is-loading, html.is-loading body { overflow: hidden; }
   .hero__deg { font-size: 56px; }
   .hero__bar { width: 120px; }
   .hero__hint { display: none; }
-  .gcard { inset-inline-start: 16px !important; inset-inline-end: 84px !important; top: auto !important; bottom: calc(18px + env(safe-area-inset-bottom)); width: auto; }
+  .gcard {
+    inset-inline-start: 16px !important; inset-inline-end: 84px !important; top: auto !important; width: auto;
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    bottom: calc(18px + env(safe-area-inset-bottom) + 100lvh - 100svh);
+  }
 }
 
 /* reduced motion / slow connections: a plain, static opening */
@@ -430,7 +464,11 @@ html.is-loading, html.is-loading body { overflow: hidden; }
 @media (max-aspect-ratio: 4/5) {
   .stop { top: 38%; width: min(64vw, 40vh); }
   .film__name { top: 38%; font-size: clamp(44px, 15vw, 96px); }
-  .finfo { inset-inline-start: 16px; inset-inline-end: 84px; width: auto; bottom: calc(18px + env(safe-area-inset-bottom)); padding: 16px 16px 16px; }
+  .finfo {
+    inset-inline-start: 16px; inset-inline-end: 84px; width: auto; padding: 16px 16px 16px;
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    bottom: calc(18px + env(safe-area-inset-bottom) + 100lvh - 100svh);
+  }
   .finfo__btns .btn { padding: 0 14px; }
   .film__intro .big, .film__outro .big { font-size: clamp(30px, 9.2vw, 140px); white-space: normal; }
   .film__intro, .film__outro { padding: 0 16px; }

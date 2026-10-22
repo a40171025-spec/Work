@@ -13,6 +13,23 @@ let finished = false;
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
+/** Order number for the WhatsApp message (the old site took it from its database): PW-YYMMDD-NNNN. */
+function orderId() {
+  const d = new Date();
+  const p = (n: number) => String(n).padStart(2, '0');
+  let r = Math.floor(Math.random() * 10000);
+  try { r = crypto.getRandomValues(new Uint32Array(1))[0] % 10000; } catch { /* old browsers: Math.random */ }
+  return `PW-${String(d.getFullYear()).slice(2)}${p(d.getMonth() + 1)}${p(d.getDate())}-${String(r).padStart(4, '0')}`;
+}
+
+/** Copy of the order to Netlify Forms. Fire and forget: it never delays or blocks WhatsApp. */
+function logOrder(fields: Record<string, string>) {
+  try {
+    const body = new URLSearchParams({ 'form-name': 'order', ...fields }).toString();
+    fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body, keepalive: true }).catch(() => {});
+  } catch { /* no fetch: WhatsApp still opens */ }
+}
+
 function render() {
   if (finished) return;
   const lines = cart.lines;
@@ -36,6 +53,7 @@ const rules: Record<string, [(v: string) => boolean, string]> = {
 
 form?.addEventListener('submit', (e) => {
   e.preventDefault();
+  if (!cart.lines.length) { render(); return; } // never send an order without watches
   const fd = new FormData(form);
   const d = Object.fromEntries([...fd.entries()].map(([k, v]) => [k, String(v).trim()])) as Record<string, string>;
   let firstBad: HTMLElement | null = null;
@@ -59,17 +77,24 @@ form?.addEventListener('submit', (e) => {
     })
     .join('\n');
   const notes = (d.notes ?? '').slice(0, 1000);
+  const id = orderId();
   const text =
-    `הזמנה חדשה מ־Paradise Watch 🛍️\n\n${items}\n\n` +
+    `הזמנה חדשה מ־Paradise Watch 🛍️\nמספר הזמנה: ${id}\n\n${items}\n\n` +
     `כמות: ${t.qty}\nסכום ביניים: ${ils(t.subtotal)}${t.discount ? `\nמבצע זוגי: -${ils(t.discount)}` : ''}\n` +
     `משלוח: ${t.shipping ? ils(t.shipping) : 'חינם'}\nסה״כ לתשלום: ${ils(t.total)}\nתשלום: מזומן לשליח\n\n` +
     `שם: ${d.name}\nטלפון: ${d.phone}\nעיר: ${d.city}\nכתובת: ${d.address}${notes ? `\nהערות: ${notes}` : ''}`;
   const url = waLink(text);
+  logOrder({
+    'order-id': id, name: d.name, phone: d.phone, city: d.city, address: d.address,
+    items: items.replace(/^• /gm, ''), total: ils(t.total), notes,
+  });
   finished = true;
   cart.clear();
   if (main) main.hidden = true;
   if (empty) empty.hidden = true;
   if (link) link.href = url;
+  const idEl = document.querySelector<HTMLElement>('[data-co-id]');
+  if (idEl) idEl.textContent = id;
   if (done) { done.hidden = false; done.focus(); }
   window.location.href = url;
 });

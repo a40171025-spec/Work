@@ -88,7 +88,11 @@ const setCart = (page, lines) => page.evaluate((l) => { localStorage.setItem('pw
       { slug: 'regent-navy', withBox: true, qty: 1 },
     ]);
     let waUrl = null;
-    await page.route(/wa\.me/, (route) => { waUrl = route.request().url(); route.abort(); });
+    const posts = [];
+    const onReq = (r) => { if (r.method() === 'POST') posts.push(r.postData() || ''); };
+    page.on('request', onReq);
+    // 204 keeps the checkout page on screen (an aborted navigation would show an error page)
+    await page.route(/wa\.me/, (route) => { waUrl = route.request().url(); route.fulfill({ status: 204, body: '' }); });
     await page.goto(BASE + '/checkout');
     await page.click('[data-co-form] button[type=submit]');
     assert.equal(await page.getAttribute('#name', 'aria-invalid'), 'true');
@@ -107,11 +111,22 @@ const setCart = (page, lines) => page.evaluate((l) => { localStorage.setItem('pw
     for (const part of ['Regent Rose Emerald — קופסה ממותגת × 1 (₪299)', 'Regent Navy — קופסה ממותגת × 1 (₪299) [הזמנה מראש]', 'מבצע זוגי: -₪99', 'משלוח: ₪50', 'סה״כ לתשלום: ₪549', 'שם: ישראל ישראלי', 'טלפון: 050-1234567', 'כתובת: הרצל 1', 'הערות: בערב']) {
       assert.ok(text.includes(part), `missing: ${part}`);
     }
+    // order number: in the message, on the screen, and in the copy sent to Netlify Forms
+    const id = (text.match(/מספר הזמנה: (PW-\d{6}-\d{4})/) || [])[1];
+    assert.ok(id, 'no order number in the WhatsApp text');
+    assert.equal((await page.textContent('[data-co-id]')).trim(), id);
+    assert.equal(await page.isVisible('[data-co-form]'), false, 'form still shown after sending');
+    const log = posts.map((b) => new URLSearchParams(b)).find((q) => q.get('form-name') === 'order');
+    assert.ok(log, 'no order copy posted');
+    assert.equal(log.get('order-id'), id);
+    assert.equal(log.get('phone'), '050-1234567');
+    page.off('request', onReq);
     await page.unroute(/wa\.me/);
     await page.goto(BASE + '/checkout');
     const left = await page.evaluate(() => JSON.parse(localStorage.getItem('pw-cart')));
     assert.deepEqual(left, []);
     assert.equal(await page.isVisible('[data-co-empty]'), true);
+    assert.equal(await page.isVisible('[data-co-form]'), false, 'order form shown with an empty cart');
   });
 
   // ---- SEO basics on every page type ----
@@ -208,6 +223,63 @@ const setCart = (page, lines) => page.evaluate((l) => { localStorage.setItem('pw
     const overflow = await p3.evaluate(() => document.documentElement.scrollWidth - innerWidth);
     assert.equal(overflow, 0);
     await ctx.close();
+  });
+
+  await check('checkout page carries the hidden Netlify order form', async () => {
+    const res = await page.goto(BASE + '/checkout');
+    const html = await res.text();
+    assert.match(html, /<form[^>]*name="order"[^>]*data-netlify="true"/);
+    for (const f of ['order-id', 'name', 'phone', 'city', 'address', 'items', 'total', 'notes']) {
+      assert.ok(html.includes(`name="${f}"`), `field ${f}`);
+    }
+  });
+
+  await check('opening frames stay under 8 MB (desktop + phone together)', async () => {
+    await page.goto(BASE + '/');
+    const m = JSON.parse(await page.textContent('#hero-data'));
+    const total = m.desktop.bytes + m.mobile.bytes;
+    assert.ok(total < 8 * 1024 * 1024, `${(total / 1048576).toFixed(2)} MB`);
+  });
+
+  // ---- phone menu ----
+  await check('phone menu opens, links work, Escape closes it', async () => {
+    const ctx = await browser.newContext({ ...devices['iPhone 13'], viewport: { width: 390, height: 844 } });
+    const p = await ctx.newPage();
+    await p.goto(BASE + '/products/monarch-ice');
+    const btn = p.locator('[data-menu-toggle]');
+    assert.equal(await btn.isVisible(), true);
+    await btn.tap();
+    assert.equal(await btn.getAttribute('aria-expanded'), 'true');
+    const links = await p.$$eval('#menu a', (as) => as.map((a) => a.getAttribute('href')));
+    for (const h of ['/#collection', '/shipping', '/#faq', '/#contact', '/terms', '/cancel']) assert.ok(links.includes(h), h);
+    assert.ok(links.some((h) => h.startsWith('https://wa.me/972535325643')));
+    await p.keyboard.press('Escape');
+    assert.equal(await p.isVisible('#menu'), false);
+    assert.equal(await p.evaluate(() => document.activeElement?.hasAttribute('data-menu-toggle')), true);
+    await btn.tap();
+    await Promise.all([p.waitForURL(/\/#faq$|\/$/), p.tap('#menu a[href="/#faq"]')]);
+    await p.waitForTimeout(900);
+    const top = await p.$eval('#faq', (el) => el.getBoundingClientRect().top);
+    assert.ok(Math.abs(top - 64) < 90, `faq top ${top}`);
+    assert.equal(await p.isVisible('#menu'), false);
+    await ctx.close();
+    const d = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+    await d.goto(BASE + '/terms');
+    assert.equal(await d.isVisible('[data-menu-toggle]'), false);
+    assert.equal(await d.isVisible('.nav'), true);
+    await d.close();
+  });
+
+  await check('no sideways scroll on any page (390 and 1440 wide)', async () => {
+    for (const vp of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
+      const p = await browser.newPage({ viewport: vp });
+      for (const path of ['/', '/products/regent-rose-emerald', '/products/regent-navy', '/checkout', '/terms', '/cancel', '/shipping', '/404']) {
+        await p.goto(BASE + path);
+        const over = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+        assert.equal(over, 0, `${path} at ${vp.width}`);
+      }
+      await p.close();
+    }
   });
 
   await browser.close();

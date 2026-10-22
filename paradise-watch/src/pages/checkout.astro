@@ -13,6 +13,7 @@ import Icon from '../components/Icon.astro';
       <div data-co-done hidden class="done" tabindex="-1">
         <h1>כמעט סיימנו ✨</h1>
         <p>ההזמנה נפתחה בוואטסאפ. ההזמנה מאושרת רק לאחר אישור שלנו בוואטסאפ.</p>
+        <p>מספר ההזמנה: <strong class="latin" data-co-id></strong></p>
         <a data-co-link href="#" target="_blank" rel="noopener" class="btn btn--wa"><Icon name="chat" /> לא נפתח? לחצו לשליחה בוואטסאפ</a>
       </div>
 
@@ -57,6 +58,13 @@ import Icon from '../components/Icon.astro';
       <noscript><p class="center">כדי להשלים הזמנה צריך להפעיל JavaScript, או לשלוח לנו הודעה בוואטסאפ 053-532-5643.</p></noscript>
     </div>
   </div>
+  <!-- Order log on Netlify (works only after "Form detection" is turned on in Netlify; otherwise nothing happens).
+       The visible form above sends the order to WhatsApp either way. -->
+  <form name="order" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
+    <input type="hidden" name="form-name" value="order" />
+    <input name="order-id" /><input name="name" /><input name="phone" /><input name="city" /><input name="address" />
+    <textarea name="items"></textarea><input name="total" /><textarea name="notes"></textarea><input name="bot-field" />
+  </form>
   <script>
     import '../scripts/checkout';
   </script>

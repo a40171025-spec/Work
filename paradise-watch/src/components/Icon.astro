@@ -11,10 +11,11 @@ import plus from 'lucide-static/icons/plus.svg?raw';
 import x from 'lucide-static/icons/x.svg?raw';
 import arrow from 'lucide-static/icons/arrow-left.svg?raw';
 import check from 'lucide-static/icons/check.svg?raw';
+import menu from 'lucide-static/icons/menu.svg?raw';
 
 const instagram = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.6" cy="6.4" r="0.6" fill="currentColor" stroke="none"/></svg>`;
 
-const icons = { bag, chat, badge, cash, truck, chevron, minus, plus, x, arrow, check, instagram } as const;
+const icons = { bag, chat, badge, cash, truck, chevron, minus, plus, x, arrow, check, instagram, menu } as const;
 export type IconName = keyof typeof icons;
 
 interface Props { name: IconName; class?: string; }

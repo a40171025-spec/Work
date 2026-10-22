@@ -1,20 +1,37 @@
 ---
 import Icon from './Icon.astro';
+import { PHONE_DISPLAY, waLink } from '../data/site';
 interface Props { solid?: boolean; }
 const { solid = false } = Astro.props;
+const links = [
+  ['/#collection', 'קולקציה'],
+  ['/shipping', 'משלוחים ותשלום'],
+  ['/#faq', 'שאלות נפוצות'],
+  ['/#contact', 'יצירת קשר'],
+] as const;
 ---
 <header class:list={['hdr', { 'is-solid': solid }]} id="hdr" data-theme="light" data-solid={solid ? 'always' : undefined}>
   <div class="wrap hdr__in">
     <a href="/" class="logo latin" aria-label="Paradise Watch, לדף הבית">Paradise <b>Watch</b></a>
     <nav class="nav" aria-label="ניווט ראשי">
-      <a href="/#collection">קולקציה</a>
-      <a href="/shipping">משלוחים ותשלום</a>
-      <a href="/#faq">שאלות נפוצות</a>
-      <a href="/#contact">יצירת קשר</a>
+      {links.map(([href, text]) => <a href={href}>{text}</a>)}
     </nav>
-    <button class="cart-btn" type="button" data-cart-open aria-haspopup="dialog" aria-controls="cart" aria-label="פתיחת הסל, 0 פריטים">
-      <Icon name="bag" />
-      <span class="cart-btn__n" data-cart-count hidden>0</span>
-    </button>
+    <div class="hdr__btns">
+      <!-- phones: the same links in a menu (desktop shows them in the bar) -->
+      <button class="menu-btn" type="button" aria-label="תפריט" aria-expanded="false" aria-controls="menu" data-menu-toggle>
+        <Icon name="menu" class="i-open" /><Icon name="x" class="i-close" />
+      </button>
+      <div class="menu" id="menu" hidden>
+        <nav aria-label="תפריט">
+          {links.map(([href, text]) => <a href={href} class="menu__link">{text}</a>)}
+          <p class="menu__small"><a href="/terms">תקנון</a><a href="/cancel">ביטול עסקה</a></p>
+          <a href={waLink()} target="_blank" rel="noopener" class="btn btn--wa btn--block"><Icon name="chat" /> וואטסאפ <span class="latin" style="font-family:var(--he)">{PHONE_DISPLAY}</span></a>
+        </nav>
+      </div>
+      <button class="cart-btn" type="button" data-cart-open aria-haspopup="dialog" aria-controls="cart" aria-label="פתיחת הסל, 0 פריטים">
+        <Icon name="bag" />
+        <span class="cart-btn__n" data-cart-count hidden>0</span>
+      </button>
+    </div>
   </div>
 </header>

@@ -11,7 +11,10 @@ type Manifest = {
   fullRotation: boolean;
   desktop: { w: number; h: number };
   mobile: { w: number; h: number };
+  /** dial centre in the desktop frames (0..1) */
   dial: [number, number];
+  /** dial centre in the phone frames; older manifests only have `dial` */
+  dialM?: [number, number];
 };
 export type HeroMode = 'scrub' | 'loop' | 'poster';
 
@@ -63,6 +66,7 @@ export function initHero(mode: HeroMode) {
   const frames: Record<'d' | 'm', (HTMLImageElement | null)[]> = { d: new Array(N).fill(null), m: new Array(N).fill(null) };
   const started: Record<'d' | 'm', boolean> = { d: false, m: false };
   const url = (s: 'd' | 'm', i: number) => `${m.base}${s}/${String(i).padStart(4, '0')}.webp`;
+  const dial = () => (set === 'm' && m.dialM ? m.dialM : m.dial);
 
   // ---------- loading ----------
   let firstDone: () => void = () => {};
@@ -132,7 +136,8 @@ export function initHero(mode: HeroMode) {
     const iw = img.naturalWidth, ih = img.naturalHeight;
     const s = Math.max(cw / iw, ch / ih);
     const dw = iw * s, dh = ih * s, dx = (cw - dw) / 2, dy = (ch - dh) / 2;
-    const px = dx + m.dial[0] * dw, py = dy + m.dial[1] * dh;
+    const [dxr, dyr] = dial();
+    const px = dx + dxr * dw, py = dy + dyr * dh;
     const tx = px + (cw / 2 - px) * centre, ty = py + (ch / 2 - py) * centre;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.fillStyle = '#f4eee2';
@@ -174,7 +179,7 @@ export function initHero(mode: HeroMode) {
       const key = `${idx}|${zoom.toFixed(3)}|${centre.toFixed(3)}|${set}`;
       if (key !== lastKey || dirty) { if (draw(idx, zoom, centre)) { lastKey = key; dirty = false; } }
     } else if (mode === 'loop') {
-      video.style.transformOrigin = `${m.dial[0] * 100}% ${m.dial[1] * 100}%`;
+      video.style.transformOrigin = `${dial()[0] * 100}% ${dial()[1] * 100}%`;
       video.style.transform = zoom > 1.001 ? `scale(${zoom.toFixed(3)})` : '';
     }
 
@@ -185,7 +190,8 @@ export function initHero(mode: HeroMode) {
     if (hint) style(hint, 1 - smoothstep(0, 0.02, p));
 
     // degree counter + progress bar
-    const mo = smoothstep(0.03, 0.07, p) * (1 - smoothstep(ROT_END - 0.03, ROT_END + 0.02, p));
+    // fades in only once the giant title has faded out, so the two never overlap on a phone
+    const mo = smoothstep(0.11, 0.15, p) * (1 - smoothstep(ROT_END - 0.03, ROT_END + 0.02, p));
     style(meter, mode === 'scrub' ? mo : 0);
     const val = String(Math.round(full ? rot * 360 : rot * 100)).padStart(3, '0');
     if (val !== lastDeg) { deg.textContent = val; lastDeg = val; }
@@ -206,8 +212,8 @@ export function initHero(mode: HeroMode) {
     let cx = W / 2, cy = H / 2;
     if (img) {
       const s = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
-      const px = (cw - img.naturalWidth * s) / 2 + m.dial[0] * img.naturalWidth * s;
-      const py = (ch - img.naturalHeight * s) / 2 + m.dial[1] * img.naturalHeight * s;
+      const px = (cw - img.naturalWidth * s) / 2 + dial()[0] * img.naturalWidth * s;
+      const py = (ch - img.naturalHeight * s) / 2 + dial()[1] * img.naturalHeight * s;
       cx = (px + (cw / 2 - px) * centre) / dpr;
       cy = (py + (ch / 2 - py) * centre) / dpr;
     }
